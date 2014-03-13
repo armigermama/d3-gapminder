@@ -66,37 +66,89 @@ dv.get.data = function() {
 /* Step 3 Getting Lots of Data */
 
 // Collects the data
-dv.get.data = function() {
-	dv.get.gdp();
-};
+// dv.get.data = function() {
+// 	dv.get.gdp();
+// };
 
-dv.get.gdp = function() {
-	d3.csv('data/gdp.csv', function(error, data) {
+// dv.get.gdp = function() {
+// 	d3.csv('data/gdp.csv', function(error, data) {
+// 		dv.setup.massage(data, 'gdp');
+// 		dv.get.life();
+// 	});
+// };
+
+// dv.get.life = function() {
+// 	d3.csv('data/life.csv', function(error, data) {
+// 		dv.setup.massage(data, 'life');
+// 		dv.get.population();
+// 	});
+// };
+
+// dv.get.population = function() {
+// 	d3.csv('data/population.csv', function(error, data) {
+// 		dv.setup.massage(data, 'population');
+// 		dv.get.fertility();
+// 	});
+// };
+
+// dv.get.fertility = function() {
+// 	d3.csv('data/fertility.csv', function(error, data) {
+// 		dv.setup.massage(data, 'fertility');
+// 		dv.setup.withData();
+// 	});
+// };
+
+// *********
+// using Async
+// *********************
+
+
+//define data getting methods for each csv files:
+dv.get.gdp = function(callback) {
+	d3.csv('data/gdp.csv', function(err, data) {
 		dv.setup.massage(data, 'gdp');
-		dv.get.life();
+		callback(err, data);
 	});
 };
 
-dv.get.life = function() {
-	d3.csv('data/life.csv', function(error, data) {
+dv.get.life = function(callback) {
+	d3.csv('data/life.csv', function(err, data) {
 		dv.setup.massage(data, 'life');
-		dv.get.population();
+		callback(err, data);
 	});
 };
 
-dv.get.population = function() {
-	d3.csv('data/population.csv', function(error, data) {
+dv.get.population = function(callback) {
+	d3.csv('data/population.csv', function(err, data) {
 		dv.setup.massage(data, 'population');
-		dv.get.fertility();
+		callback(err, data);
 	});
 };
 
-dv.get.fertility = function() {
-	d3.csv('data/fertility.csv', function(error, data) {
+dv.get.fertility = function(callback) {
+	d3.csv('data/fertility.csv', function(err, data) {
 		dv.setup.massage(data, 'fertility');
-		dv.setup.withData();
+		callback(err, data);
 	});
 };
+
+// Using async to call the get data functions:
+dv.get.data = function() {
+	async.parallel(
+	[
+		dv.get.gdp, 
+		dv.get.life, 
+		dv.get.population, 
+		dv.get.fertility
+	], 
+	function(err, results) {
+	if (err) { 
+		console.log('async error', err); 
+	}
+	dv.setup.withData();
+	})
+};
+
 
 // Merges the data into a single array, cleans and converts csv strings to numbers, finds maximum values, restricts the data to the countries and time frame specified in dv.opt
 dv.setup.massage = function(data, name) {
